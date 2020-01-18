@@ -1,12 +1,18 @@
 package com.orest.rest_recap.user;
 
 import com.orest.rest_recap.Bean;
-import javassist.NotFoundException;
 
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import org.springframework.hateoas.EntityModel;
+
+import org.springframework.hateoas.server.core.TypeReferences;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -31,8 +37,20 @@ public class UserResource {
     }
 
     @GetMapping("/user/{id}")
-    public User foundUser(@PathVariable int id) throws NotFoundException {
-        return userDaoService.findUser(id);
+    public EntityModel<User> foundUser(@PathVariable int id)  {
+
+            User foundUser = userDaoService.findUser(id);
+            if (foundUser == null) {
+                throw new UserNotFoundException("user with id - " + id + " not found");
+            }
+
+        EntityModel<User> model = new EntityModel<>(foundUser);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).allUsers());
+        model.add(linkTo.withRel("all-users"));
+
+
+
+                return model;
     }
 
     // CREATED
@@ -40,7 +58,7 @@ public class UserResource {
     // output - CREATED & Return the created URI
 
     @PostMapping("/users")
-    public ResponseEntity<Object> createUser(@RequestBody User user) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
        User savedUser =  userDaoService.createUser(user);
 
         URI location = ServletUriComponentsBuilder
@@ -52,6 +70,12 @@ public class UserResource {
        return ResponseEntity.created(location).build();
 
     }
+
+    @DeleteMapping("/delete/user/{id}")
+    public void deleteUser(@PathVariable int id) {
+            userDaoService.deleteUser(id);
+    }
+
 }
 
 

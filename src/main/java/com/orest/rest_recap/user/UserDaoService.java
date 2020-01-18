@@ -1,8 +1,7 @@
 package com.orest.rest_recap.user;
 
 
-import javassist.NotFoundException;
-import org.springframework.beans.BeanUtils;
+
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -60,7 +59,17 @@ public class UserDaoService {
 
         user = saveUser(newUser);
         return user;
+    }
 
+    public void deleteUser(int id) {
+
+        User userToDelete = findUser(id);
+
+        if (userToDelete == null) {
+            throw new UserNotFoundException("User with id " + id + " not found ");
+        }
+
+        users.remove(userToDelete);
 
     }
 
