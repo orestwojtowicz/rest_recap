@@ -2,6 +2,7 @@ package com.orest.rest_recap.user;
 
 
 import javassist.NotFoundException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -29,23 +30,38 @@ public class UserDaoService {
 
     public User saveUser(User user) {
         if(user.getId() == null) {
-            user.setId(usersCount++);
+            user.setId(++usersCount);
         }
       users.add(user);
         return user;
     }
 
-    public User findUser(int id) throws NotFoundException {
+    public User findUser(int id) {
 
-        User foundUser = new User();
+
         for (User user : users) {
             if (user.getId() == id) {
-                 foundUser = user;
-            } else {
-                throw new NotFoundException("User not found with id " + id);
+              return user;
             }
         }
-        return foundUser;
+        return null;
+    }
+
+    public User createUser(User user) {
+
+        if (user == null) {
+            throw new NullPointerException();
+        }
+
+        User newUser = new User();
+        newUser.setId(++usersCount);
+        newUser.setName(user.getName());
+        newUser.setBirthDate(new Date());
+
+        user = saveUser(newUser);
+        return user;
+
+
     }
 
 
