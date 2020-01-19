@@ -1,15 +1,10 @@
 package com.orest.rest_recap.user;
 
 import com.orest.rest_recap.Bean;
-
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
+import com.orest.rest_recap.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.EntityModel;
-
-
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,17 +13,21 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.Locale;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-public class UserResource {
+public class UserJpaResource {
 
+    private UserRepository userRepository;
     private UserDaoService userDaoService;
     private MessageSource messageSource;
 
-    public UserResource(UserDaoService userDaoService, MessageSource messageSource) {
-        this.userDaoService = userDaoService;
+    public UserJpaResource(UserRepository userRepository, MessageSource messageSource, UserDaoService userDaoService) {
+        this.userRepository = userRepository;
         this.messageSource = messageSource;
+        this.userDaoService = userDaoService;
     }
 
 /*    @GetMapping("/hello")
@@ -41,7 +40,7 @@ public class UserResource {
     }*/
 
 
-    @GetMapping("/hello")
+    @GetMapping("/jpa/hello")
     public String goodMorning() {
 
   /*      return messageSource.getMessage("good.morning.message",
@@ -51,17 +50,17 @@ public class UserResource {
     }
 
 
-    @GetMapping("/hello/{name}")
+    @GetMapping("/jpa/hello/{name}")
     public Bean hello(@PathVariable String name) {
         return new Bean(String.format("Hello man, %s", name));
     }
 
-    @GetMapping("/users/all")
+    @GetMapping("/jpa/users/all")
     List<User> allUsers() {
-        return userDaoService.findAll();
+        return userRepository.findAll();
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/jpa/user/{id}")
     public EntityModel<User> foundUser(@PathVariable int id)  {
 
             User foundUser = userDaoService.findUser(id);
@@ -81,7 +80,7 @@ public class UserResource {
     // input - details of users
     // output - CREATED & Return the created URI
 
-    @PostMapping("/users")
+    @PostMapping("/jpa/users")
     public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
        User savedUser =  userDaoService.createUser(user);
 
@@ -95,9 +94,9 @@ public class UserResource {
 
     }
 
-    @DeleteMapping("/delete/user/{id}")
+    @DeleteMapping("/jpa//delete/user/{id}")
     public void deleteUser(@PathVariable int id) {
-            userDaoService.deleteUser(id);
+        userRepository.deleteById(id);
     }
 
 }
