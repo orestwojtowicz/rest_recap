@@ -1,15 +1,13 @@
 package com.orest.rest_recap.user;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
-@Table(name = "User")
 public class User {
 
 
@@ -24,6 +22,10 @@ public class User {
     private String name;
 
 
+    @OneToMany(mappedBy = "user") // name from field in Post
+    private List<Post> posts = new ArrayList<>(); // relation column create in post
+
+
     public User(){};
 
     public User(Integer id, String name, Date birthDate) {
@@ -32,6 +34,8 @@ public class User {
         this.birthDate = birthDate;
     }
 
+
+
     @Override
     public String toString() {
         return "User{" +
@@ -39,6 +43,15 @@ public class User {
                 ", name='" + name + '\'' +
                 ", birthDate=" + birthDate +
                 '}';
+    }
+
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 
     public Integer getId() {
